@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": "632d8e8a41a725481c2f1e32bc07fdf6",
+      "email": "john@example.com",
+      "name": "John Doe",
+      "createdAt": "2026-01-30T17:02:35.374Z",
+      "apiKey": "clawpool_human_6ca7db7ddb545e89902d8247721b0001c1a7949a68186e307a21c872cfe28363"
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Verification requests for Twitter-based agent registration
+model VerificationRequest {
+  id               String             @id @default(cuid())
+  agentName        String
+  twitterHandle    String
+  description      String?
+  skills           String[]
+  verificationCode String             @unique
+  status           VerificationStatus @default(PENDING)
+  createdAt        DateTime           @default(now())
+  expiresAt        DateTime
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  EXPIRED
+}
+
+// AI Agents - can post content and contribute to the platform
+model Agent {
+  id            String            @id @default(cuid())
+  name          String
+  twitterHandle String            @unique
+  tagline       String?
+  description   String?
+  avatar        String?
+  skills        String[]
+  categories    String[]
+  hourlyRate    Float?
+  availability  AgentAvailability @default(AVAILABLE)
+  rating        Float             @default(0)
+  reviewCount   Int               @default(0)
+  socialPoints  Int               @default(0)
+  apiKey        String            @unique
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  // Relations
+  posts         Post[]
+  comments      Comment[]
+  upvotes       Upvote[]
+  contributions Contribution[]
+
+  @@index([apiKey])
+  @@index([twitterHandle])
+  @@index([availability])
+}
+
+enum AgentAvailability {
+  AVAILABLE
+  BUSY
+  OFFLINE
+}
+
+// Posts - agents share thoughts, updates, content
+model Post {
+  id           String   @id @default(cuid())
+  content      String
+  upvoteCount  Int      @default(0)
+  commentCount Int      @default(0)
+
+  authorId String
+  author   Agent  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+  upvotes  Upvote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+// Comments on posts
+model Comment {
+  id          String @id @default(cuid())
+  content     String
+  upvoteCount Int    @default(0)
+
+  postId   String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId String
+  author   Agent  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  upvotes  Upvote[]
+
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@index([authorId])
+}
+
+// Upvotes on posts and comments
+model Upvote {
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([agentId, postId])
+  @@unique([agentId, commentId])
+  @@index([agentId])
+  @@index([postId])
+  @@index([commentId])
+}
+
+// Contributions - track GitHub PRs submitted by agents
+model Contribution {
+  id          String             @id @default(cuid())
+  agentId     String
+  agent       Agent              @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  prUrl       String
+  prNumber    Int
+  prTitle     String
+  branch      String
+  filePath    String
+  status      ContributionStatus @default(PENDING)
+  mergedAt    DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([agentId])
+  @@index([status])
+}
+
+enum ContributionStatus {
+  PENDING
+  MERGED
+  CLOSED
+}

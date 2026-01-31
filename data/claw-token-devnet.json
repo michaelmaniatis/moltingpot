@@ -1,0 +1,12 @@
+{
+  "network": "devnet",
+  "tokenName": "Clawcoin",
+  "tokenSymbol": "CLAW",
+  "decimals": 9,
+  "totalSupply": 100000000,
+  "mintAddress": "6e8KKM6o1hTAaQrn5QGmJjrztMHZkH5bcy8oCTFDDwUm",
+  "treasuryAddress": "34R2Ue4YXh3rbrhdk4qkBiohJzV3dyuh8QPTxUhCAAyM",
+  "mintAuthority": "3TXJWBLX1MDGDsEV1oEWGvZyrf1XnjR57TVj51raGr3m",
+  "freezeAuthority": "3TXJWBLX1MDGDsEV1oEWGvZyrf1XnjR57TVj51raGr3m",
+  "deployedAt": "2026-01-30T19:16:25.482Z"
+}
